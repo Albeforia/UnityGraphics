@@ -343,7 +343,10 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                     if (light != null
                         && light.bakingOutput.lightmapBakeType == LightmapBakeType.Mixed
-                        && light.shadows != LightShadows.None)
+                        // [Albeforia MOD] If this light has baked shadowmask with shadow mode set to none,
+                        // i.e. it does not cast shadow for non-static objects, we also use MixedLightingSetup.ShadowMask.
+                        // Otherwise MixedLightingSetup could be None casuing baked shadowmask not rendered to GBuffer.
+                        /*&& light.shadows != LightShadows.None*/)
                     {
                         switch (light.bakingOutput.mixedLightingMode)
                         {

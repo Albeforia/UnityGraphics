@@ -50,7 +50,7 @@ namespace UnityEditor.VFX.UI
             if (s_Instance == null)
                 s_Instance = new VFXPaste();
 
-            s_Instance.PasteStickyNotes(data as SerializableGraph, Vector2.zero, viewController.graph.UIInfos);
+            s_Instance.PasteStickyNotes(viewController, data as SerializableGraph, Vector2.zero, viewController.graph.UIInfos);
         }
 
         static bool CanPasteSubgraph(VisualEffectSubgraph subgraph, string openedAssetPath)
@@ -271,7 +271,7 @@ namespace UnityEditor.VFX.UI
 
             //Paste Everything else
             PasteGroupNodes(serializableGraph, center, ui);
-            PasteStickyNotes(serializableGraph, center, ui);
+            PasteStickyNotes(viewController, serializableGraph, center, ui);
 
             PasteDatas(viewController, serializableGraph); // TODO Data settings should be pasted at context creation. This can lead to issues as blocks are added before data is initialized
             PasteDataEdges(serializableGraph);
@@ -406,8 +406,11 @@ namespace UnityEditor.VFX.UI
             {
                 string name = settings[i].name;
                 var field = fields.Find(t => t.Name == name);
-                if (field != null)
+                try
+                {
                     field.SetValue(model, settings[i].value.Get());
+                }
+                catch { } // Don't break paste operation if a field value cannot be assigned (see UUM-46548)
             }
         }
 
@@ -656,7 +659,7 @@ namespace UnityEditor.VFX.UI
             }
         }
 
-        private void PasteStickyNotes(SerializableGraph serializableGraph, Vector2 center, VFXUI ui)
+        private void PasteStickyNotes(VFXViewController vfxViewController, SerializableGraph serializableGraph, Vector2 center, VFXUI ui)
         {
             if (serializableGraph.stickyNotes != null && serializableGraph.stickyNotes.Length > 0)
             {
@@ -674,6 +677,8 @@ namespace UnityEditor.VFX.UI
                         position = new Rect(center + offset, t.position.size)
                     };
                 })).ToArray();
+
+                vfxViewController?.graph?.Invalidate(VFXModel.InvalidationCause.kUIChanged);
             }
         }
 

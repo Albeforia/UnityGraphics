@@ -385,6 +385,14 @@ namespace UnityEditor.ShaderGraph
         internal delegate void SaveGraphDelegate(Shader shader, object context);
         internal static SaveGraphDelegate onSaveGraph;
 
+        #region SubData
+
+        [SerializeField]
+        internal List<JsonData<AbstractShaderGraphDataExtension>> m_SubDatas = new List<JsonData<AbstractShaderGraphDataExtension>>();
+        public DataValueEnumerable<AbstractShaderGraphDataExtension> SubDatas => m_SubDatas.SelectValue();
+
+        #endregion
+
         #region Targets
 
         // Serialized list of user-selected active targets, sorted in displayName order (to maintain deterministic serialization order)
@@ -1804,12 +1812,7 @@ namespace UnityEditor.ShaderGraph
 
         public void OnKeywordChangedNoValidate()
         {
-            var allNodes = GetNodes<AbstractMaterialNode>();
-            foreach (AbstractMaterialNode node in allNodes)
-            {
-                node.Dirty(ModificationScope.Topological);
-                node.ValidateNode();
-            }
+            DirtyAll<AbstractMaterialNode>(ModificationScope.Topological);         
         }
 
         public void OnDropdownChanged()
@@ -1820,12 +1823,7 @@ namespace UnityEditor.ShaderGraph
 
         public void OnDropdownChangedNoValidate()
         {
-            var allNodes = GetNodes<AbstractMaterialNode>();
-            foreach (AbstractMaterialNode node in allNodes)
-            {
-                node.Dirty(ModificationScope.Topological);
-                node.ValidateNode();
-            }
+            DirtyAll<AbstractMaterialNode>(ModificationScope.Topological);
         }
 
         public void CleanupGraph()
@@ -1857,6 +1855,26 @@ namespace UnityEditor.ShaderGraph
                     RemoveEdgeNoValidate(edge, false);
                 }
             }
+        }
+
+        private void DirtyAll<T>(ModificationScope modificationScope) where T : AbstractMaterialNode
+        {
+            graphIsConcretizing = true;
+            try
+            {
+                var allNodes = GetNodes<T>();
+                foreach (var node in allNodes)
+                {
+                    node.Dirty(modificationScope);
+                    node.ValidateNode();
+                }
+            }
+            catch (System.Exception e)
+            {
+                graphIsConcretizing = false;
+                throw e;
+            }
+            graphIsConcretizing = false;
         }
 
         public void ValidateGraph()

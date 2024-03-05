@@ -781,7 +781,15 @@ namespace UnityEngine.Rendering.HighDefinition
                 using (var builder = renderGraph.AddRenderPass<CopyDepthPassData>("Copy depth buffer", out var passData, ProfilingSampler.Get(HDProfileId.CopyDepthBuffer)))
                 {
                     var depthMipchainSize = hdCamera.depthMipChainSize;
-                    passData.inputDepth = builder.ReadTexture(output.resolvedDepthBuffer);
+
+                    //HACK - HACK - HACK - Do not remove, please take a gpu capture and analyze the placement of fences.
+                    // Reason: The following issue occurs when Async compute for gpu light culling is enabled.
+                    // In vulkan, dx12 and consoles the first read of a texture always triggers a depth decompression
+                    // (in vulkan is seen as a vk event, in dx12 as a barrier, and in gnm as a straight up depth decompress compute job).
+                    // Unfortunately, the current render graph implementation only see's the current texture as a read since the abstraction doesnt go too low.
+                    // The GfxDevice has no context of passes so it can't put the barrier in the right spot... so for now hacking this by *assuming* this is the first read. :( 
+                    passData.inputDepth = builder.ReadWriteTexture(output.resolvedDepthBuffer);
+                    //passData.inputDepth = builder.ReadTexture(output.resolvedDepthBuffer);
 
                     passData.outputDepth = builder.WriteTexture(renderGraph.CreateTexture(new TextureDesc(depthMipchainSize.x, depthMipchainSize.y, true, true)
                         { colorFormat = GraphicsFormat.R32_SFloat, enableRandomWrite = true, name = "CameraDepthBufferMipChain" }));
@@ -1063,12 +1071,11 @@ namespace UnityEngine.Rendering.HighDefinition
         class DownsampleDepthForLowResPassData
         {
             public bool useGatherDownsample;
-            public float sourceWidth;
-            public float sourceHeight;
             public float downsampleScale;
             public Material downsampleDepthMaterial;
             public TextureHandle depthTexture;
             public TextureHandle downsampledDepthBuffer;
+            public Rect viewport;
 
             // Data needed for potentially writing
             public Vector2Int mip0Offset;
@@ -1109,8 +1116,7 @@ namespace UnityEngine.Rendering.HighDefinition
 
                 passData.computesMip1OfAtlas = computeMip1OfPyramid;
                 passData.downsampleScale = hdCamera.lowResScale;
-                passData.sourceWidth = hdCamera.actualWidth;
-                passData.sourceHeight = hdCamera.actualHeight;
+                passData.viewport = hdCamera.lowResViewport;
                 passData.depthTexture = builder.ReadTexture(output.depthPyramidTexture);
                 if (computeMip1OfPyramid)
                 {
@@ -1139,10 +1145,7 @@ namespace UnityEngine.Rendering.HighDefinition
                             data.downsampleDepthMaterial.SetVector(HDShaderIDs._ScaleBias, new Vector4(uvScaleX, uvScaleY, 0.0f, 0.0f));
                         }
 
-                        float destWidth = data.sourceWidth * data.downsampleScale;
-                        float destHeight = data.sourceHeight * data.downsampleScale;
-                        Rect targetViewport = new Rect(0.0f, 0.0f, destWidth, destHeight);
-                        context.cmd.SetViewport(targetViewport);
+                        context.cmd.SetViewport(data.viewport);
                         context.cmd.DrawProcedural(Matrix4x4.identity, data.downsampleDepthMaterial, 0, MeshTopology.Triangles, 3, 1, null);
 
                         if (data.computesMip1OfAtlas)

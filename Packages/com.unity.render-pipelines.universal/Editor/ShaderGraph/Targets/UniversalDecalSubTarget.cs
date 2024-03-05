@@ -973,7 +973,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             public static KeywordCollection DBufferProjector = new KeywordCollection
             {
                 { CoreKeywordDescriptors.DBuffer },
-                { CoreKeywordDescriptors.FoveatedRendering },
                 { Descriptors.DecalLayers },
             };
 
@@ -991,9 +990,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreKeywordDescriptors.AdditionalLights },
                 { CoreKeywordDescriptors.AdditionalLightShadows },
                 { CoreKeywordDescriptors.ShadowsSoft },
-                { CoreKeywordDescriptors.ShadowsSoftLow },
-                { CoreKeywordDescriptors.ShadowsSoftMedium },
-                { CoreKeywordDescriptors.ShadowsSoftHigh },
                 { CoreKeywordDescriptors.LightmapShadowMixing },
                 { CoreKeywordDescriptors.ShadowsShadowmask },
                 { CoreKeywordDescriptors.ForwardPlus },
@@ -1014,11 +1010,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreKeywordDescriptors.AdditionalLights },
                 { CoreKeywordDescriptors.AdditionalLightShadows },
                 { CoreKeywordDescriptors.ShadowsSoft },
-                { CoreKeywordDescriptors.ShadowsSoftLow },
-                { CoreKeywordDescriptors.ShadowsSoftMedium },
-                { CoreKeywordDescriptors.ShadowsSoftHigh },
                 { CoreKeywordDescriptors.ForwardPlus },
-                { CoreKeywordDescriptors.FoveatedRendering },
                 { Descriptors.DecalsNormalBlend },
                 { Descriptors.DecalLayers },
             };
@@ -1030,9 +1022,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { CoreKeywordDescriptors.DirectionalLightmapCombined },
                 { CoreKeywordDescriptors.MainLightShadows },
                 { CoreKeywordDescriptors.ShadowsSoft },
-                { CoreKeywordDescriptors.ShadowsSoftLow },
-                { CoreKeywordDescriptors.ShadowsSoftMedium },
-                { CoreKeywordDescriptors.ShadowsSoftHigh },
                 { CoreKeywordDescriptors.LightmapShadowMixing },
                 { CoreKeywordDescriptors.MixedLightingSubtractive },
                 { Descriptors.DecalsNormalBlend },
@@ -1046,9 +1035,6 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 { CoreKeywordDescriptors.MainLightShadows },
                 { CoreKeywordDescriptors.ShadowsSoft },
-                { CoreKeywordDescriptors.ShadowsSoftLow },
-                { CoreKeywordDescriptors.ShadowsSoftMedium },
-                { CoreKeywordDescriptors.ShadowsSoftHigh },
                 { Descriptors.DecalsNormalBlend },
                 { Descriptors.DecalLayers },
                 { CoreKeywordDescriptors.GBufferNormalsOct },

@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 Version Updated
 The version number for this package has increased due to a version update of a related graphics package.
 
+## [14.0.9] - 2023-12-21
+
+This version is compatible with Unity 2022.3.18f1.
+
+### Changed
+- Vulkan URP will use MSAA samples count fallback from player settings. Prior to this x2 fallback would have been to upgrade to x4.
+- Improved renderViewportScale for XR intermediate textures.
+- Improved runtime performance by adding checks for _ALPHATEST_ON when rendering depth, shadows and depth normals.
+
+### Fixed
+- Fixed per-vertex light layers.
+- Added workarounds for MSAA-specific visual artifacts on materials that use alpha clipping in unexpected ways.
+- Fixed an issue causing decals to be culled erroneously when using the Screen Space technique.
+- Fixed an issue where Rendering Layers didn't work properly when opening a project.
+- Disabled Motion Blur effect in EditMode to keep the game view clear while editing. Motion Blur works as before in PlayMode and standalone builds.
+- Fixed _WorldSpaceCameraPos is not set correctly in XR Multipass.
+- Fixed Color Grading Mode set to Low Dynamic Range on one camera in the stack despite HDR output active.
+- Fixed an issue where building a project using deferred with batchmode and nographics resulted in incorrect variant stripping.
+- Fixed an issue where Unlit shaders would not output correct normals when using deferred and Accurate GBuffer Normals.
+- Fixed HDR Debug Views break the native render pass when enabled once.
+- Updated the documentation to mention that the Screen Space decal technique does not support blending of normals when using the Deferred rendering path with Accurate G-Buffer Normals enabled. The Automatic decal technique now prefers the D-Buffer technique if Accurate G-Buffer Normals are enabled.
+- Fixed partially corrupted Android screen when Vulkan display rotation during rendering is enabled.
+- Use local random state for post-processing.
+- Fixed SH vertex evaluation mode in URPLit shader graph.
+- Fixed FXAA resulting in a too-dark image when using in combination with HDR output, and bilinear/nearest-neightbor upscaling.
+- Fixed an issue where screen space decals would not calculate ambient lighting correctly.
+- The Fullscreen Render Feature doesn't cause rendering layers to run in the depth normals prepass anymore.
+- Fixed an issue where Light Layers did not check scene lighting setting when enabling the keyword.
+
 ## [14.0.8] - 2023-09-27
 
 This version is compatible with Unity 2022.3.11f1.
@@ -839,7 +868,7 @@ This version is compatible with Unity 2022.2.0a14.
 - Fixed an issue where Terrain hole Shader changes were missing. [Case 1179808](https://issuetracker.unity3d.com/issues/terrain-brush-tool-is-not-drawing-when-paint-holes-is-selected).
 - Fixed an issue where the Shader Graph `SceneDepth` node didn't work with XR single-pass (double-wide) rendering. See [case 1123069](https://issuetracker.unity3d.com/issues/lwrp-vr-shadergraph-scenedepth-doesnt-work-in-single-pass-rendering).
 - Fixed Unlit and BakedLit shader compilations in the meta pass.
-- Fixed an issue where the Bokeh Depth of Field shader would fail to compile on PS4.
+- Fixed an issue where the Bokeh Depth of Field shader would fail to compile on a console platform.
 - Fixed an issue where the Scene lighting button didn't work when you used the 2D Renderer.
 - Fixed a performance regression when you used the 2D Renderer.
 - Fixed an issue where the Freeform 2D Light gizmo didn't correctly show the Falloff offset.
@@ -1430,7 +1459,7 @@ Read/write XRGraphicsConfig -> Read-only XRGraphics interface to XRSettings.
 
 ### Fixed
 - Post-processing now works with VR on PC.
-- PS4 compiler error
+- Console platform compiler error
 - Fixed VR multiview rendering by forcing MSAA to be off. There's a current issue in engine that breaks MSAA and Texture2DArray.
 - Fixed UnityPerDraw CB layout
 - GLCore compute buffer compiler error

@@ -279,11 +279,17 @@ EditorBuildSettings:
     path: Assets/Scenes/201_DepthNormalsDeferred.unity
     guid: dafa2658c5a644673a2697d24ad96ffe
   - enabled: 1
+    path: Assets/Scenes/201_DepthNormalsDeferred_AccurateGBuffer.unity
+    guid: ef6895fb19f2e42639db3e3a801fa76f
+  - enabled: 1
     path: Assets/Scenes/201_DepthNormalsForward.unity
     guid: 50a55af44edbd47579041b1556ed9a58
   - enabled: 1
     path: Assets/Scenes/202_SSAO_Depth.unity
     guid: 2696010bf40d644cc8abc0b1304c59db
+  - enabled: 1
+    path: Assets/Scenes/202_SSAO_Depth_DownSample.unity
+    guid: 07434decccca04d53bb951a513c06901
   - enabled: 1
     path: Assets/Scenes/203_SSAO_DepthNormal.unity
     guid: c207f769f3e194ebc8cbd51e788ac65d

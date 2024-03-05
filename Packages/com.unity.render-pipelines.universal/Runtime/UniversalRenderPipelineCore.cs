@@ -440,9 +440,14 @@ namespace UnityEngine.Rendering.Universal
                 if (xr.enabled)
                     hdrDisplayOutputActive = xr.isHDRDisplayOutputActive;
 #endif
-        		return hdrDisplayOutputActive && allowHDROutput && resolveToScreen;
+                return hdrDisplayOutputActive && allowHDROutput && resolveToScreen;
             }
         }
+
+        /// <summary>
+        /// True if the last camera in the stack outputs to an HDR screen
+        /// </summary>
+        internal bool stackLastCameraOutputToHDR;
 
         /// <summary>
         /// HDR Display information about the current display this camera is rendering to.
@@ -515,7 +520,7 @@ namespace UnityEngine.Rendering.Universal
             if (!SystemInfo.graphicsUVStartsAtTop)
                 return false;
 
-            if (cameraType == CameraType.SceneView)
+            if (cameraType == CameraType.SceneView || cameraType == CameraType.Preview)
                 return true;
 
             var handleID = new RenderTargetIdentifier(handle.nameID, 0, CubemapFace.Unknown, 0);
@@ -638,6 +643,11 @@ namespace UnityEngine.Rendering.Universal
         /// True if post-processing is enabled for this camera.
         /// </summary>
         public bool postProcessEnabled;
+
+        /// <summary>
+        /// True if post-processing is enabled for any camera in this camera's stack.
+        /// </summary>
+        internal bool stackAnyPostProcessingEnabled;
 
         /// <summary>
         /// Provides set actions to the renderer to be triggered at the end of the render loop for camera capture.
@@ -1009,7 +1019,7 @@ namespace UnityEngine.Rendering.Universal
         /// True if fast approximation functions are used when converting between the sRGB and Linear color spaces, false otherwise.
         /// </summary>
         public bool useFastSRGBLinearConversion;
-        
+
         /// <summary>
         /// Returns true if Data Driven Lens Flare are supported by this asset, false otherwise.
         /// </summary>
@@ -1195,8 +1205,8 @@ namespace UnityEngine.Rendering.Universal
         /// <summary> Keyword used for Gamma 2.0. </summary>
         public const string Gamma20 = "_GAMMA_20";
 
-        /// <summary> Keyword used for Gamma 2.0 with HDR_INPUT. </summary>
-        public const string Gamma20AndHDRInput = "_GAMMA_20_AND_HDR_INPUT";
+        /// <summary> Keyword used for Fast Approximate Anti-aliasing (FXAA) with Gamma 2.0 encoding. </summary>
+        public const string FxaaAndGamma20 = "_FXAA_AND_GAMMA_20";
 
         /// <summary> Keyword used for high quality sampling for Depth Of Field. </summary>
         public const string HighQualitySampling = "_HIGH_QUALITY_SAMPLING";
@@ -1783,9 +1793,9 @@ namespace UnityEngine.Rendering.Universal
     }
 
     // Internal class to detect and cache runtime platform information.
-    // TODO: refine the logic to provide platform abstraction. Eg, we should devide platforms based on capabilities and perf budget.
-    // TODO: isXRMobile is a bad catagory. Alignment and refactor needed.
-    // TODO: Compress all the query data into "isXRMobile" style bools and enums.
+    // TODO: refine the logic to provide platform abstraction. Eg, we should divide platforms based on capabilities and perf budget.
+    // TODO: isXRMobile is a bad category. Alignment and refactor needed.
+    // TODO: Compress all the query data into "isXRMobile" style booleans and enums.
     internal static class PlatformAutoDetect
     {
         /// <summary>
@@ -1793,17 +1803,20 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         internal static void Initialize()
         {
-            bool isRunningXRMobile = false;
-#if ENABLE_VR && ENABLE_VR_MODULE
-#if PLATFORM_WINRT || PLATFORM_ANDROID
-            isRunningXRMobile = IsRunningXRMobile();
-#endif
-#endif
-            isXRMobile = isRunningXRMobile;
+            bool isRunningMobile = false;
+            #if ENABLE_VR && ENABLE_VR_MODULE
+                #if PLATFORM_WINRT || PLATFORM_ANDROID
+                    isRunningMobile = IsRunningXRMobile();
+                #endif
+            #endif
+
+            isXRMobile = isRunningMobile;
+            isShaderAPIMobileDefined = GraphicsSettings.HasShaderDefine(BuiltinShaderDefine.SHADER_API_MOBILE);
+            isSwitch = Application.platform == RuntimePlatform.Switch;
         }
 
 #if ENABLE_VR && ENABLE_VR_MODULE
-#if PLATFORM_WINRT || PLATFORM_ANDROID
+    #if PLATFORM_WINRT || PLATFORM_ANDROID
         // XR mobile platforms are not treated as dedicated mobile platforms in Core. Handle them specially here. (Quest and HL).
         private static List<XR.XRDisplaySubsystem> displaySubsystemList = new List<XR.XRDisplaySubsystem>();
         private static bool IsRunningXRMobile()
@@ -1822,12 +1835,40 @@ namespace UnityEngine.Rendering.Universal
             }
             return false;
         }
-#endif
+    #endif
 #endif
 
         /// <summary>
         /// If true, the runtime platform is an XR mobile platform.
         /// </summary>
-        static internal bool isXRMobile { get; private set; } = false;
+        internal static bool isXRMobile { get; private set; } = false;
+
+        /// <summary>
+        /// If true, then SHADER_API_MOBILE has been defined in URP Shaders.
+        /// </summary>
+        internal static bool isShaderAPIMobileDefined { get; private set; } = false;
+
+        /// <summary>
+        /// If true, then the runtime platform is set to Switch.
+        /// </summary>
+        internal static bool isSwitch { get; private set; } = false;
+
+        /// <summary>
+        /// Gives the SH evaluation mode when set to automatically detect.
+        /// </summary>
+        /// <param name="mode">The current SH evaluation mode.</param>
+        /// <returns>Returns the SH evaluation mode to use.</returns>
+        internal static ShEvalMode ShAutoDetect(ShEvalMode mode)
+        {
+            if (mode == ShEvalMode.Auto)
+            {
+                if (isXRMobile || isShaderAPIMobileDefined || isSwitch)
+                    return ShEvalMode.PerVertex;
+                else
+                    return ShEvalMode.PerPixel;
+            }
+
+            return mode;
+        }
     }
 }

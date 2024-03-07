@@ -65,6 +65,9 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             // Desktop OpenGL, OpenGL ES 3.0, OpenGL ES 2.0, WebGL 2.0.
             #pragma exclude_renderers gles gles3 glcore
 
+            // Enable debug symbols
+            #pragma enable_d3d11_debug_symbols
+
             // -------------------------------------
             // Shader Stages
             #pragma vertex Vertex
@@ -113,6 +116,9 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             // Deferred Rendering Path does not support the OpenGL-based graphics API:
             // Desktop OpenGL, OpenGL ES 3.0, OpenGL ES 2.0, WebGL 2.0.
             #pragma exclude_renderers gles gles3 glcore
+
+            // Enable debug symbols
+            #pragma enable_d3d11_debug_symbols
 
             // -------------------------------------
             // Shader Stages
@@ -177,6 +183,9 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             // Desktop OpenGL, OpenGL ES 3.0, OpenGL ES 2.0, WebGL 2.0.
             #pragma exclude_renderers gles gles3 glcore
 
+            // Enable debug symbols
+            #pragma enable_d3d11_debug_symbols
+
             // -------------------------------------
             // Shader Stages
             #pragma vertex Vertex
@@ -238,6 +247,9 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             // Deferred Rendering Path does not support the OpenGL-based graphics API:
             // Desktop OpenGL, OpenGL ES 3.0, OpenGL ES 2.0, WebGL 2.0.
             #pragma exclude_renderers gles gles3 glcore
+
+            // Enable debug symbols
+            #pragma enable_d3d11_debug_symbols
 
             // -------------------------------------
             // Shader Stages
@@ -303,6 +315,9 @@ Shader "Hidden/Universal Render Pipeline/StencilDeferred"
             // Deferred Rendering Path does not support the OpenGL-based graphics API:
             // Desktop OpenGL, OpenGL ES 3.0, OpenGL ES 2.0, WebGL 2.0.
             #pragma exclude_renderers gles gles3 glcore
+
+            // Enable debug symbols
+            #pragma enable_d3d11_debug_symbols
 
             // -------------------------------------
             // Shader Stages

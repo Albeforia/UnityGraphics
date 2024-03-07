@@ -1,6 +1,8 @@
 Shader "Hidden/Universal Render Pipeline/FinalPost"
 {
     HLSLINCLUDE
+        // Enable debug symbols
+        #pragma enable_d3d11_debug_symbols
         #pragma multi_compile_local_fragment _ _POINT_SAMPLING _RCAS _EASU_RCAS_AND_HDR_INPUT
         #pragma multi_compile_local_fragment _ _FXAA
         #pragma multi_compile_local_fragment _ _FILM_GRAIN

@@ -197,7 +197,7 @@ namespace UnityEngine.Rendering.Universal
             // Account for Sprite Mask and normal map usage where the first and last layer has to render the stencil pass
             // bool hasSpriteMask = UnityEngine.SpriteMaskUtility.HasSpriteMaskInScene();
             // FIXME The line above cannot compile (https://github.com/Albeforia/UnityGraphics/commit/0e565b14904e89ac8a609c121a7ff774170a358c)
-            hasSpriteMask = false;
+            bool hasSpriteMask = false;
             bool normalsFirstClear = true;
 
             // Draw lights
